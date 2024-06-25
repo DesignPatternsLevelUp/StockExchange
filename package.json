@@ -1,0 +1,19 @@
+{
+  "name": "stock-exchange",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install && esbuild handlers/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.140",
+    "esbuild": "^0.21.5"
+  }
+}
