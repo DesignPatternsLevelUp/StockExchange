@@ -1,5 +1,5 @@
 import {SQSHandler} from 'aws-lambda';
-import {Business} from "../definitions/Business";
+import {Business} from "../../definitions/Business";
 
 const insertIntoDb = async (data: Business): Promise<Business & { id: string } | null> => {
     return null; // TODO
