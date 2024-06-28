@@ -22,7 +22,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         }
     } catch (error) {
         return {
-            statusCode: 424,
+            statusCode: 502,
             body: JSON.stringify({message: 'Bank Service unavailable, try again later'})
         }
     }

@@ -7,7 +7,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm install && esbuild handlers/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist",
+    "build": "npm install && esbuild handlers/**/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
