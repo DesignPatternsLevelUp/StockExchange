@@ -1,0 +1,40 @@
+service: stock-exchange-api-v1
+frameworkVersion: '3'
+package:
+  individually: true
+params:
+  default:
+    APIGATEWAY_ID: hewwo # TODO
+    CORS_ACCESS_CONTROL_ALLOW_ORIGIN: OwO # TODO
+functions:
+  createBusiness:
+    name: ${self:service}-createBusiness
+    handler: dist/http/createBusinessLambda.handler
+    disableLogs: true
+    events:
+      - http:
+          cors:
+            origin: bbdgrad.com
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Api-Channel
+          method: POST
+          path: magento/cart/add
+          authorizer:
+            authorizerId: ${param:AUTHORIZER_ID} # TODO
+            type: CUSTOM
+  createBusinessSQS:
+    name: ${self:service}-createBusinessSQS
+    handler: dist/sqs/createBusinessLambda.handler
+    disableLogs: true
+    events:
+      - sqs:
+          arn: !GetAtt createBusinessQueue.Arn
+          batchSize: 1
+          maximumBatchingWindow: 0
+          maximumConcurrency: 1
