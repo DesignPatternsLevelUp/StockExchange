@@ -24,7 +24,99 @@ functions:
               - X-Amz-User-Agent
               - X-Api-Channel
           method: POST
-          path: magento/cart/add
+          path: businesses
+          authorizer:
+            authorizerId: ${param:AUTHORIZER_ID} # TODO
+            type: CUSTOM
+  getBusinesses:
+    name: ${self:service}-getBusinesses
+    handler: dist/http/getBusinessesLambda.handler
+    disableLogs: true
+    events:
+      - http:
+          cors:
+            origin: bbdgrad.com
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Api-Channel
+          method: GET
+          path: businesses
+          authorizer:
+            authorizerId: ${param:AUTHORIZER_ID} # TODO
+            type: CUSTOM
+  getBusinessStockholders:
+    name: ${self:service}-getBusinessStockholders
+    handler: dist/http/getBusinessStockholdersLambda.handler
+    disableLogs: true
+    events:
+      - http:
+          cors:
+            origin: bbdgrad.com
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Api-Channel
+          method: GET
+          path: businesses/{businessId}
+          request:
+            parameters:
+              paths:
+                businessId: true
+          authorizer:
+            authorizerId: ${param:AUTHORIZER_ID} # TODO
+            type: CUSTOM
+  getMarketStocks:
+    name: ${self:service}-getMarketStocks
+    handler: dist/http/getMarketStocksLambda.handler
+    disableLogs: true
+    events:
+      - http:
+          cors:
+            origin: bbdgrad.com
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Api-Channel
+          method: GET
+          path: stocks
+          authorizer:
+            authorizerId: ${param:AUTHORIZER_ID} # TODO
+            type: CUSTOM
+  getUserStocks:
+    name: ${self:service}-getUserStocks
+    handler: dist/http/getUserStocksLambda.handler
+    disableLogs: true
+    events:
+      - http:
+          cors:
+            origin: bbdgrad.com
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - X-Api-Channel
+          method: GET
+          path: users/{userId}
+          request:
+            parameters:
+              paths:
+                userId: true
           authorizer:
             authorizerId: ${param:AUTHORIZER_ID} # TODO
             type: CUSTOM
