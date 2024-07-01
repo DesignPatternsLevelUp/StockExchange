@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, Repository } from "typeorm";
 import { Person } from "./person";
 import { Company } from "./company";
 
@@ -18,4 +18,8 @@ export class Owner {
     @OneToOne(() => Company, { onUpdate: "CASCADE", onDelete: "CASCADE" })
     @JoinColumn()
     company: Company | undefined;
+
+    public get entity() : Person | Company {
+        return (this.isCompany) ? this.company as Company : this.person as Person;
+    }
 }
