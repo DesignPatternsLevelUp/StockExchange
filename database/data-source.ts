@@ -5,7 +5,7 @@ import { Person, Owner, Company, Transaction, Share } from "./models";
 
 dotenv.config();
 
-export const DBDataSource = new DataSource({
+export const DBDataSource: DataSource = new DataSource({
     type: "postgres",
     host: process.env["POSTGRESS_HOST"],
     port: 5432,

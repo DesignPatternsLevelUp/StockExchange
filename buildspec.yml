@@ -1,0 +1,17 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - npm install
+  pre_build:
+    commands:
+      - npm run test
+      - rm -rf ./__tests__
+      - npm prune --production
+  build:
+    commands:
+      - aws cloudformation package --template buy-sell-stocks.yaml --s3-bucket $BUY_SELL_STOCKS_S3_BUCKET --output-template buy-sell-stocks-export.yml
+artifacts:
+  type: zip
+  files:
+    - buy-sell-stocks-export.yml
