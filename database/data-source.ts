@@ -5,7 +5,7 @@ import { Person, Owner, Company, Transaction, Share } from "./models";
 
 dotenv.config();
 
-export const DBDataSource: DataSource = new DataSource({
+const DBDataSource: DataSource = new DataSource({
     type: "postgres",
     host: process.env["POSTGRESS_HOST"],
     port: 5432,
@@ -19,3 +19,13 @@ export const DBDataSource: DataSource = new DataSource({
     // TODO: Remove once we have code for migrations
     migrationsTableName: "type_orm_migrations",
 });
+
+DBDataSource.initialize()
+    .then(() => {
+        console.log("Data Source has been initialized!");
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization", err);
+    });
+
+export { DBDataSource };
