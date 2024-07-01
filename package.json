@@ -1,0 +1,39 @@
+{
+  "name": "stock-exchange",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install && esbuild handlers/**/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist",
+    "build-models": "esbuild database/models/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist/database/models",
+    "build-data-source": "esbuild database/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist/database/",
+    "generate-typeorm-migrations": "npx typeorm migration:generate dist/database/migrations/migration -d dist/database/data-source.js -o",
+    "run-typeorm-migrations": "npx typeorm migration:run -d dist/database/data-source.js",
+    "typeorm-migrations": "npm run build-models && npm run build-data-source && npm run generate-typeorm-migrations && npm run run-typeorm-migrations",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.212.0",
+    "@types/aws-sdk": "^2.7.0",
+    "aws-sdk": "^2.1649.0",
+    "dotenv": "^16.4.5",
+    "pg": "^8.12.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.140",
+    "@types/node": "^20.14.9",
+    "aws-sdk-client-mock": "^4.0.1",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.19.0",
+    "jest": "^29.7.0"
+  }
+}
