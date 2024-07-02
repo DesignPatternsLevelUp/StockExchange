@@ -32,8 +32,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Rename build file
+        run: mv ${{ matrix.lambdafiles }}Lambda.js index.js
+
+
       - name: Zip
-        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip  ./${{ matrix.lambdafiles }}Lambda.js)
+        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip index.js)
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
