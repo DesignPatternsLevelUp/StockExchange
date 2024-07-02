@@ -36,7 +36,7 @@ jobs:
         run: mv node_modules dist/node_modules
 
       - name: Zip
-        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ${{ matrix.lambdafiles }}Lambda.js)
+        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ../node_modules ${{ matrix.lambdafiles }}Lambda.js)
 
       - name: Deploy to AWS
         uses: appleboy/lambda-action@master
