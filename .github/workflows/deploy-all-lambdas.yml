@@ -39,7 +39,7 @@ jobs:
         run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ../../package.json ../../package-lock.json ../node_modules ./${{ matrix.lambdafiles }}Lambda.js ./${{ matrix.lambdafiles }}Lambda.js.map)
 
       - name: Archive code coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.lambdafiles }}Lambda.zip
           path: ${{ matrix.lambdafiles }}Lambda.zip
