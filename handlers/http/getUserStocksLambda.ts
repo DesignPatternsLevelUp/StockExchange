@@ -1,8 +1,21 @@
 import {APIGatewayProxyHandler} from "aws-lambda";
 import {Stock} from "../../definitions/Stock";
+import {query, withClient} from "../../helpers/DBquery";
 
 const getStocksFromDb = async (ownerId: string): Promise<Array<Stock> | null> => {
-    return null; // TODO
+    return withClient(client => query<Stock>(client, `
+    SELECT
+        S.companyId AS businessId,
+        SUM(S.numShares) AS quantity,
+        C.pricePerShare AS currentMarketValue
+    FROM
+        Shares S
+    JOIN
+        Companies C ON S.companyId = C.id
+    WHERE
+        S.ownerId = $1 AND S.forSale = false
+    GROUP BY
+        S.companyId;`, [ownerId]));
 }
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {

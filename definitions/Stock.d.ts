@@ -5,6 +5,7 @@ export type Stock =  {
 }
 
 export type StockHolder = {
+    quantity: number;
     holderId: string;
     holderType: string;
     bankAccount: string;

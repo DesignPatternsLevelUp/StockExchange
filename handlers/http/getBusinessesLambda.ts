@@ -1,8 +1,16 @@
 import {APIGatewayProxyHandler} from "aws-lambda";
 import {Business} from "../../definitions/Business";
+import {query, withClient} from "../../helpers/DBquery";
 
 const getBusinessesFromDb = async (): Promise<Array<Business & { currentMarketValue: number, id: string }> | null> => {
-    return null; // TODO
+    return withClient(client => query<Business & { currentMarketValue: number, id: string }>(client,`
+    SELECT
+        id,
+        name,
+        pricePerShare AS currentMarketValue
+    FROM
+        Companies;
+    `));
 }
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
