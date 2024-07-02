@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  buy-sell-stocks
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Resources:
+  buySharesHttp:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers/http/buySharesLambda.handler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: HTTP producer for buyShares Functionality.
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Dev stage"
+    Value: !Sub "http://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Dev/"
