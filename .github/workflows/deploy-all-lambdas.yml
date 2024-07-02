@@ -39,7 +39,7 @@ jobs:
         run: mv package.json dist/http/package.json 
 
       - name: Move package.json to dist
-        run: mv package.json dist/http/package.json 
+        run: mv package-lock.json dist/http/package-lock.json 
 
       - name: Zip
         run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ./package.json ./package-lock.json ./node_modules ./${{ matrix.lambdafiles }}Lambda.js ./${{ matrix.lambdafiles }}Lambda.js.map)
