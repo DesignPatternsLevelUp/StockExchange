@@ -41,8 +41,17 @@ jobs:
       - name: Move package.json to dist
         run: mv package-lock.json dist/http/package-lock.json 
 
+      - name: Move definitions to dist
+        run: mv definitions dist/http/definitions
+  
+      - name: Move integrations to dist
+        run: mv integrations dist/http/integrations
+      
+      - name: Move helpers to dist
+        run: mv helpers dist/http/helpers
+
       - name: Zip
-        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ./package.json ./package-lock.json ./node_modules ./${{ matrix.lambdafiles }}Lambda.js ./${{ matrix.lambdafiles }}Lambda.js.map)
+        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ./package.json ./package-lock.json ./node_modules ./integrations ./helpers ./definitions ./${{ matrix.lambdafiles }}Lambda.js ./${{ matrix.lambdafiles }}Lambda.js.map)
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
