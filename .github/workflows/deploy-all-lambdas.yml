@@ -33,13 +33,19 @@ jobs:
         run: npm run build
 
       - name: Move node_modules to dist
-        run: mv node_modules dist/node_modules 
+        run: mv node_modules dist/http/node_modules 
+
+      - name: Move package.json to dist
+        run: mv package.json dist/http/package.json 
+
+      - name: Move package.json to dist
+        run: mv package.json dist/http/package.json 
 
       - name: Zip
-        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ../../package.json ../../package-lock.json ../node_modules ./${{ matrix.lambdafiles }}Lambda.js ./${{ matrix.lambdafiles }}Lambda.js.map)
+        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ./package.json ./package-lock.json ./node_modules ./${{ matrix.lambdafiles }}Lambda.js ./${{ matrix.lambdafiles }}Lambda.js.map)
 
       - name: Archive code coverage results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.lambdafiles }}Lambda.zip
           path: ${{ matrix.lambdafiles }}Lambda.zip
