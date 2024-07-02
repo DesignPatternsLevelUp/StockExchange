@@ -29,8 +29,8 @@ jobs:
       - name: Deploy to AWS
         uses: appleboy/lambda-action@master
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: GITHUB_ACTION_LAMBDA
+          aws-region: ${{ secrets.AWS_REGION }}
           function_name: ${{ matrix.lambdafiles }}
           zip_file: ${{ matrix.lambdafiles }}.zip
