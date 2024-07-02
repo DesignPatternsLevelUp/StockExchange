@@ -33,7 +33,7 @@ jobs:
         run: npm run build
 
       - name: Rename build file
-        run: mv ${{ matrix.lambdafiles }}Lambda.js index.js
+        run: mv dist/http/${{ matrix.lambdafiles }}Lambda.js dist/http/index.js
 
 
       - name: Zip
