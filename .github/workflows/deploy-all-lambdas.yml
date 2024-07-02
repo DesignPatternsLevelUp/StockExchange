@@ -33,10 +33,10 @@ jobs:
         run: npm run build
 
       - name: Move node_modules to dist
-        run: mv node_modules dist/node_modules
+        run: mv node_modules dist/node_modules 
 
       - name: Zip
-        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ../node_modules ${{ matrix.lambdafiles }}Lambda.js ${{ matrix.lambdafiles }}Lambda.js.map)
+        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip ../../package.json ../../package-lock.json ../node_modules ${{ matrix.lambdafiles }}Lambda.js ${{ matrix.lambdafiles }}Lambda.js.map)
 
       - name: Deploy to AWS
         uses: appleboy/lambda-action@master
