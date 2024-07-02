@@ -12,7 +12,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-        lambdafiles: [createBusiness,getBusinessStockholders,getBusinessesLambda,getMarketStocks,getUserStocks]
+        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
