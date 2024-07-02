@@ -23,7 +23,7 @@ jobs:
         with:
           audience: sts.amazonaws.com.cn
           role-to-assume: ${{ secrets.AWS_ROLE }}
-          role-session-name: github-lambda_deploy
+          role-session-name: github_lambda_deploy_${{ matrix.lambdafiles }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Install Dependencies
