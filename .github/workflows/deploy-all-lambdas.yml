@@ -5,7 +5,10 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  deploy:
+    strategy:
+      matrix:
+        lambdafiles: [bar,baz,foo]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -19,13 +22,6 @@ jobs:
 
       - name: Move node_modules to dist
         run: mv node_modules dist/node_modules
-
-  deploy:
-    strategy:
-      matrix:
-        lambdafiles: [bar,baz,foo]
-    runs-on: ubuntu-latest
-    steps:
 
       - name: Zip
         run: (cd dist && zip -r ../${{ matrix.lambdafiles }}.zip ${{ matrix.lambdafiles }}.js)
