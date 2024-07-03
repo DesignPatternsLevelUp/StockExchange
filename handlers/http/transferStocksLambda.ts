@@ -15,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         await new SQSClient({
             region: process.env.REGION,
-        }).send(new SendMessageCommand({QueueUrl: process.env.transferStockQueueUrl, MessageBody: JSON.stringify({...body, callbackUrl})}))
+        }).send(new SendMessageCommand({QueueUrl: process.env.transferStockQueueUrl, MessageBody: JSON.stringify({...body, callbackUrl}), MessageGroupId: 'transferStock', MessageDeduplicationId: `${Date.now()}`}))
         return {
             statusCode: 202,
             body: JSON.stringify({message: 'Request Accepted'}),
