@@ -3,7 +3,7 @@ import {query, withClient} from "../../helpers/DBquery";
 import {Client} from "pg";
 
 const buyStock = async (client: Client, body: { ownerId: string, companyId: string, quantity: number}) => {
-    await query(client, `
+    const sharesToBuy = await query<{id: string, sellerId: string, companyId: string, sharesToBuy: number}>(client, `
             WITH "SelectedShares" AS (
                 SELECT
                     "id",
@@ -14,7 +14,7 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                 FROM
                     "Shares"
                 WHERE
-                    "companyId" = $2 AND "forSale" = B'1'
+                    "companyId" = $1 AND "forSale" = B'1'
                 FOR UPDATE SKIP LOCKED
             ),
             "SharesToBuy" AS (
@@ -22,58 +22,59 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                     "id",
                     "ownerId" AS "sellerId",
                     "companyId",
-                    LEAST("numShares", $3 - SUM("numShares") OVER (ORDER BY "id")) AS "sharesToBuy"
+                    LEAST("numShares", $2 - SUM("numShares") OVER (ORDER BY "id")) AS "sharesToBuy"
                 FROM
                     "SelectedShares"
                 WHERE
-                    "cumulativeShares" <= $3
-                    OR ("cumulativeShares" - "numShares" < $3 AND "cumulativeShares" >= $3)
-            ),
-            "CompanyPrice" AS (
-                SELECT
-                    "id",
-                    "pricePerShare"
-                FROM
-                    "Companies"
-                WHERE
-                    "id" = $2
+                    "cumulativeShares" <= $2
+                    OR ("cumulativeShares" - "numShares" < $2 AND "cumulativeShares" >= $2)
             )
-            UPDATE "Shares"
-            SET "numShares" = "numShares" - "SharesToBuy"."sharesToBuy",
-                "forSale" = CASE WHEN "numShares" - "SharesToBuy"."sharesToBuy" = 0 THEN B'0' ELSE "forSale" END
-            FROM "SharesToBuy"
-            WHERE "Shares"."id" = "SharesToBuy"."id";
-
-            DELETE FROM "Shares"
-            USING "SharesToBuy"
-            WHERE "Shares"."id" = "SharesToBuy"."id" AND "Shares"."numShares" = 0;
-
-            INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
             SELECT
+                "id",
+                "sellerId",
                 "companyId",
-                SUM("sharesToBuy"),
-                $1 AS "ownerId",
-                B'0'
+                "sharesToBuy"
             FROM
-                "SharesToBuy"
-            GROUP BY
-                "companyId"
+                "SharesToBuy";`, [body.companyId, body.quantity]) ?? [];
+
+    for (const share of sharesToBuy) {
+        const updateSharesQuery = `
+                UPDATE "Shares"
+                SET "numShares" = "numShares" - $1,
+                    "forSale" = CASE WHEN "numShares" - $1 = 0 THEN B'0' ELSE "forSale" END
+                WHERE "id" = $2;
+            `;
+        await query(client, updateSharesQuery, [share.sharesToBuy, share.id]);
+        const deleteSharesQuery = `
+                DELETE FROM "Shares"
+                WHERE "id" = $1 AND "numShares" = 0;
+            `;
+        await query(client, deleteSharesQuery, [share.id]);
+    }
+
+    const insertOrUpdateSharesQuery = `
+            INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
+            VALUES ($1, $2, $3, B'0')
             ON CONFLICT ("companyId", "ownerId")
             DO UPDATE SET
-                "numShares" = "Shares"."numShares" + "EXCLUDED"."numShares";
+                "numShares" = "Shares"."numShares" + EXCLUDED."numShares";
+        `;
 
-            INSERT INTO "Transactions" ("sellerId", "buyerId", "quantity", "pricePerShare", "companyId")
-            SELECT
-                "sellerId",
-                $1 AS "buyerId",
-                "sharesToBuy",
-                "CP"."pricePerShare",
-                "STB"."companyId"
-            FROM
-                "SharesToBuy" "STB"
-            JOIN
-                "CompanyPrice" "CP" ON "STB"."companyId" = "CP"."id";`,
-        [body.ownerId, body.companyId, body.quantity]);
+    const totalSharesToBuy = sharesToBuy.reduce((sum, share) => sum + share.sharesToBuy, 0);
+    await query(client, insertOrUpdateSharesQuery, [body.companyId, totalSharesToBuy, body.ownerId]);
+    const companyPriceQuery = `
+            SELECT "pricePerShare"
+            FROM "Companies"
+            WHERE "id" = $1;
+        `;
+    const [companyPrice] = await query<{pricePerShare: number}>(client, companyPriceQuery, [body.companyId]) ?? [];
+    for (const share of sharesToBuy) {
+        const insertTransactionQuery = `
+                INSERT INTO "Transactions" ("sellerId", "buyerId", "quantity", "pricePerShare", "companyId")
+                VALUES ($1, $2, $3, $4, $5);
+            `;
+        await query(client, insertTransactionQuery, [share.sellerId, body.ownerId, share.sharesToBuy, companyPrice.pricePerShare, body.companyId]);
+    }
     return {
         ...body,
     };
