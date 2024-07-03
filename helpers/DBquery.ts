@@ -10,7 +10,7 @@ export async function withClient<T>(handler: (client: Client) => T) {
     };
     console.log('DB Config:', config);
     const client = new Client(config);
-
+    await client.connect();
     try {
         return handler(client);
     } finally {
