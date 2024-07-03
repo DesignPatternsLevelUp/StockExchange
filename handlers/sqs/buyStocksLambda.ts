@@ -22,7 +22,7 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                     "id",
                     "ownerId" AS "sellerId",
                     "companyId",
-                    LEAST("numShares", $2 - SUM("numShares") OVER (ORDER BY "id")) AS "sharesToBuy"
+                    LEAST("numShares", "numShares" + ($2 - SUM("numShares")) OVER (ORDER BY "id")) AS "sharesToBuy"
                 FROM
                     "SelectedShares"
                 WHERE
@@ -64,7 +64,7 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                 "numShares" = "Shares"."numShares" + EXCLUDED."numShares";
         `;
 
-    const totalSharesToBuy = sharesToBuy.reduce((sum, share) => sum + share.sharesToBuy, 0);
+    const totalSharesToBuy = sharesToBuy.reduce((sum, share) => sum + Number(share.sharesToBuy), 0);
     const insertOrUpdateResponse = await query(client, insertOrUpdateSharesQuery, [body.companyId, totalSharesToBuy, body.ownerId]);
     console.log('Insert or Update Response:', insertOrUpdateResponse);
     const companyPriceQuery = `
