@@ -9,7 +9,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     const code = parseInput<{ code: string }>(event);
     const token = await fetch(`${process.env.tokenEndpoint}?client_id=${process.env.clientId}&client_secret=${process.env.clientSecret}&redirect_uri=${new URL(process.env.redirectUrl ?? '' )}&grant_type=authorization_code&code=${code}`);
-    
+    console.log(`${process.env.tokenEndpoint}?client_id=${process.env.clientId}&client_secret=${process.env.clientSecret}&redirect_uri=${new URL(process.env.redirectUrl ?? '' )}&grant_type=authorization_code&code=${code}`);
     if (token){
         return {
             statusCode: 200,
