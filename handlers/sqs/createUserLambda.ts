@@ -39,7 +39,7 @@ export const handler: SQSHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     const [record] = event.Records;
-    const user: { bankAccount: string } & { callBackUrl: string } = JSON.parse(record.body);
+    const user: { bankAccount: string } & { callbackUrl: string } = JSON.parse(record.body);
     const representation = await insertIntoDb(user);
-    await fetch(user.callBackUrl, {body: JSON.stringify(representation), method: 'POST'});
+    await fetch(user.callbackUrl, {body: JSON.stringify(representation), method: 'POST'});
 };

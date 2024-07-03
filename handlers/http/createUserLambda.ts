@@ -6,8 +6,8 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     const user = parseInput<{  bankAccount: string }>(event);
-    const callBackUrl = event.queryStringParameters?.['callBackUrl'];
-    if (!user || !callBackUrl) return {
+    const callbackUrl = event.queryStringParameters?.['callbackUrl'];
+    if (!user || !callbackUrl) return {
         statusCode: 400,
         body: JSON.stringify({message: 'Badly formatted request'})
     }
@@ -28,7 +28,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         await new SQSClient({
             region: process.env.REGION,
-        }).send(new SendMessageCommand({QueueUrl: process.env.createUserQueueUrl, MessageBody: JSON.stringify({...user, callBackUrl}), MessageGroupId: 'createUser', MessageDeduplicationId: user.bankAccount}))
+        }).send(new SendMessageCommand({QueueUrl: process.env.createUserQueueUrl, MessageBody: JSON.stringify({...user, callbackUrl}), MessageGroupId: 'createUser', MessageDeduplicationId: user.bankAccount}))
         return {
             statusCode: 202,
             body: JSON.stringify({message: 'Request Accepted'}),

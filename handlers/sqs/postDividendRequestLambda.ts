@@ -5,19 +5,8 @@ export const handler: SQSHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     const [record] = event.Records;
-    const body: { referenceId: string, businessId: string } & { callBackUrl: string } = JSON.parse(record.body);
-    let linkedTransaction;
-    let page = 1;
-    let pageSize = 25;
-    while (!linkedTransaction) {
-        const response = await fetch(`${process.env.BANK_URL}/transactions?page=${page}&pageSize=${pageSize}`, { headers: { 'X-Origin': 'stock_exchange'} });
-        if (!response.ok) throw new Error('Bank down');
-        const body = await response.json();
-        const transactions: Array<{creditRef: string, debitAccountName: string, amount: number}> = body.data.items;
-        if (transactions.length === 0) throw new Error('No payment yet');
-        linkedTransaction = transactions.find(transaction => transaction.creditRef === body.referenceId);
-    }
-    const amountToDisperse = linkedTransaction.amount * 0.9; // 10% convenience fee
+    const body: { amount: number, businessId: string } = JSON.parse(record.body);
+    const amountToDisperse = body.amount * 0.9; // 10% convenience fee
     await withClient(async client => {
         const holders = await query<{bankAccount: string, numberOfShares: number}>(client, `
         SELECT
