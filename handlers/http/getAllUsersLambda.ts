@@ -2,10 +2,11 @@ import {APIGatewayProxyHandler} from "aws-lambda";
 import {Users} from "../../definitions/Users";
 import {query, withClient} from "../../helpers/DBquery";
 
-const getUsersFromDb = async (): Promise<Array<Users & { id: string }> | null> => {
-    return withClient(client => query<Users & { id: string }>(client,`
+const getUsersFromDb = async (): Promise<Array<Users & { id: string, bankAccount:string }> | null> => {
+    return withClient(client => query<Users & { id: string, bankAccount:string }>(client,`
     SELECT
-        "id"
+        "id",
+        "bankAccount
     FROM
         "Persons";
     `));
