@@ -36,6 +36,8 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
             FROM
                 "SharesToBuy";`, [body.companyId, body.quantity]) ?? [];
 
+    console.log('Shares to buy:', sharesToBuy);
+
     for (const share of sharesToBuy) {
         const updateSharesQuery = `
                 UPDATE "Shares"
@@ -43,12 +45,14 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                     "forSale" = CASE WHEN "numShares" - $1 = 0 THEN B'0' ELSE "forSale" END
                 WHERE "id" = $2;
             `;
-        await query(client, updateSharesQuery, [share.sharesToBuy, share.id]);
+        const updateResponse = await query(client, updateSharesQuery, [share.sharesToBuy, share.id]);
+        console.log('Update response:', updateResponse)
         const deleteSharesQuery = `
                 DELETE FROM "Shares"
                 WHERE "id" = $1 AND "numShares" = 0;
             `;
-        await query(client, deleteSharesQuery, [share.id]);
+        const deleteResponse = await query(client, deleteSharesQuery, [share.id]);
+        console.log('Delete response:', deleteResponse);
     }
 
     const insertOrUpdateSharesQuery = `
@@ -60,7 +64,8 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
         `;
 
     const totalSharesToBuy = sharesToBuy.reduce((sum, share) => sum + share.sharesToBuy, 0);
-    await query(client, insertOrUpdateSharesQuery, [body.companyId, totalSharesToBuy, body.ownerId]);
+    const insertOrUpdateResponse = await query(client, insertOrUpdateSharesQuery, [body.companyId, totalSharesToBuy, body.ownerId]);
+    console.log('Insert or Update Response:', insertOrUpdateResponse);
     const companyPriceQuery = `
             SELECT "pricePerShare"
             FROM "Companies"
@@ -72,7 +77,8 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                 INSERT INTO "Transactions" ("sellerId", "buyerId", "quantity", "pricePerShare", "companyId")
                 VALUES ($1, $2, $3, $4, $5);
             `;
-        await query(client, insertTransactionQuery, [share.sellerId, body.ownerId, share.sharesToBuy, companyPrice.pricePerShare, body.companyId]);
+        const transactionResponse =await query(client, insertTransactionQuery, [share.sellerId, body.ownerId, share.sharesToBuy, companyPrice.pricePerShare, body.companyId]);
+        console.log('TransactionResponse:', transactionResponse);
     }
     return {
         ...body,
