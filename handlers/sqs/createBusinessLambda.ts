@@ -46,5 +46,9 @@ export const handler: SQSHandler = async (event, context) => {
     const [record] = event.Records;
     const business: Business & { callbackUrl: string } = JSON.parse(record.body);
     const representation = await insertIntoDb(business);
-    await fetch(business.callbackUrl, {body: JSON.stringify(representation), method: 'POST'});
+    try {
+        await fetch(business.callbackUrl, {body: JSON.stringify(representation), method: 'POST'});
+    } catch {
+        // ignore
+    }
 };
