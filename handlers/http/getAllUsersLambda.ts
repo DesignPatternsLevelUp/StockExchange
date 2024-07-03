@@ -6,7 +6,7 @@ const getUsersFromDb = async (): Promise<Array<Users & { id: string, bankAccount
     return withClient(client => query<Users & { id: string, bankAccount:string }>(client,`
     SELECT
         "id",
-        "bankAccount
+        "bankAccount"
     FROM
         "Persons";
     `));
