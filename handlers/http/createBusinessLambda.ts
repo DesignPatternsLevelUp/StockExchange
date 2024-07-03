@@ -21,6 +21,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             };
         }
     } catch (error) {
+        console.error('Bank call failed:', error)
         return {
             statusCode: 502,
             body: JSON.stringify({message: 'Bank Service unavailable, try again later'})
