@@ -15,7 +15,8 @@ const getStocksFromDb = async (ownerId: string): Promise<Array<Stock> | null> =>
     WHERE
         "S"."ownerId" = $1 AND "S"."forSale" = B'0'
     GROUP BY
-        "S"."companyId";`, [ownerId]));
+        "S"."companyId",
+        "C"."pricePerShare";`, [ownerId]));
 }
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
