@@ -27,7 +27,7 @@ const sellStock = async (client: Client, body: { sellerId: string, companyId: st
     if (update.length === 0) {
         await query(client, `
         INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
-                 VALUES ($1, $2, $3, B'0')`,
+                 VALUES ($1, $2, $3, B'1')`,
             [body.companyId, body.quantity, body.sellerId])
     }
     return {
