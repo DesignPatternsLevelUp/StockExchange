@@ -13,7 +13,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         body: JSON.stringify({message: 'Badly formatted request'})
     }
     try {
-        const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${business.bankAccount}`, { method: 'GET', });
+        const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${business.bankAccount}`, { method: 'GET', headers: { 'X-Origin': 'stock_exchange'}});
         console.log('Bank response:', verified);
         if (verified.status === 404) {
             return {
@@ -31,7 +31,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         await new SQSClient({
             region: process.env.REGION,
-        }).send(new SendMessageCommand({QueueUrl: process.env.createBusinessQueueUrl, MessageBody: JSON.stringify({...business, callBackUrl})}))
+        }).send(new SendMessageCommand({QueueUrl: process.env.createBusinessQueueUrl, MessageBody: JSON.stringify({...business, callBackUrl}), MessageGroupId: 'createBusiness'}))
         return {
             statusCode: 202,
             body: JSON.stringify({message: 'Request Accepted'}),
