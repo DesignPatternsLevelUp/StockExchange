@@ -15,7 +15,6 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                     "Shares"
                 WHERE
                     "companyId" = $1 AND "forSale" = B'1'
-                FOR UPDATE SKIP LOCKED
             ),
             "SharesToBuy" AS (
                 SELECT
