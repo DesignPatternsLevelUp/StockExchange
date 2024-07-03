@@ -13,7 +13,7 @@ const getStocksFromDb = async (ownerId: string): Promise<Array<Stock> | null> =>
     JOIN
         "Companies" "C" ON "S"."companyId" = "C"."id"
     WHERE
-        "S"."ownerId" = $1 AND "S"."forSale" = 0
+        "S"."ownerId" = $1 AND "S"."forSale" = "0"
     GROUP BY
         "S"."companyId";`, [ownerId]));
 }

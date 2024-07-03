@@ -11,7 +11,7 @@ const createUser = async (client: Client, user: { bankAccount: string}) => {
     if (!userDetails) throw new Error ('Insert user failed');
     const [ownerResult] = await query<{id: string}>(client, `
     INSERT INTO "Owners" ("isCompany", "personId")
-         VALUES (0, $1)
+         VALUES ("0", $1)
     RETURNING "id"`, [userDetails.id]) ?? [];
     if (!ownerResult) throw new Error('Insert Owner failed');
     return {
