@@ -12,7 +12,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks,sqs]
+        lambdafiles: [http/createBusiness,http/getBusinessStockholders,http/getBusinesses,http/getMarketStocks,http/getUserStocks,sqs/sqs]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -33,11 +33,10 @@ jobs:
         run: npm run build
 
       - name: Rename build file
-        run: mv dist/http/${{ matrix.lambdafiles }}Lambda.js dist/http/index.js
-
+        run: mv dist/${{ matrix.lambdafiles }}Lambda.js ./index.js
 
       - name: Zip
-        run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip index.js)
+        run: zip -r ${{ matrix.lambdafiles }}Lambda.zip index.js
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
