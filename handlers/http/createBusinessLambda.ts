@@ -14,6 +14,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }
     try {
         const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${business.bankAccount}`, { method: 'GET', });
+        console.log('Bank response:', verified);
         if (verified.status === 404) {
             return {
                 statusCode: 400,
@@ -21,7 +22,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
             };
         }
     } catch (error) {
-        console.error('Bank call failed:', error)
+        console.error('Bank call failed:', error);
         return {
             statusCode: 502,
             body: JSON.stringify({message: 'Bank Service unavailable, try again later'})
