@@ -15,7 +15,7 @@ export async function withClient<T>(handler: (client: Client) => T) {
     const client = new Client(config);
     await client.connect();
     try {
-        return handler(client);
+        return await handler(client);
     } finally {
         await client.end();
     }
