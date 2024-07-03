@@ -54,7 +54,7 @@ jobs:
   deploySQS:
     strategy:
       matrix:
-        sqsLambdafiles: [createBusiness,createUser,postDividendRequest,transferStocks]
+        sqsLambdafiles: [createBusiness,createUser,postDividendRequest,transferStocks,sellStocks]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
