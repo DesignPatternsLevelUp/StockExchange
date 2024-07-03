@@ -5,11 +5,11 @@ import {query, withClient} from "../../helpers/DBquery";
 const getBusinessesFromDb = async (): Promise<Array<Business & { currentMarketValue: number, id: string }> | null> => {
     return withClient(client => query<Business & { currentMarketValue: number, id: string }>(client,`
     SELECT
-        id,
-        name,
-        pricePerShare AS currentMarketValue
+        "id",
+        "name",
+        "pricePerShare" AS "currentMarketValue"
     FROM
-        Companies;
+        "Companies";
     `));
 }
 
