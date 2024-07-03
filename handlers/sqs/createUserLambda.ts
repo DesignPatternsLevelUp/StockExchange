@@ -4,7 +4,7 @@ import {Client} from "pg";
 
 const createUser = async (client: Client, user: { bankAccount: string}) => {
     const [userDetails] = await query<{id: string}>(client, `
-    INSERT INTO "Users" ("bankAccount")
+    INSERT INTO "Persons" ("bankAccount")
         VALUES ($1)
     RETURNING "id"`,
         [user.bankAccount]) ?? [];
