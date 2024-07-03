@@ -28,12 +28,21 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 const businessId = transaction.reference;
                 const [business] = await withClient(client => query<{id: string}>(client, `
                 SELECT "id" FROM "Companies" WHERE "id" = $1`, [businessId])) ?? [];
-                const [user] = await withClient(client => query<{id: string}>(client, `
-                SELECT "id" FROM "Persons" WHERE "bankAccount" = $1`, [bankAccount])) ?? [];
-                if (!business || !user) break; // free money woo-hoo
+                const [owner] = await withClient(client => query(client, `
+                SELECT
+                    "O"."id" AS "id"
+                FROM
+                    "Owners" "O"
+                LEFT JOIN
+                    "Persons" "P" ON "O"."personId" = "P"."id"
+                LEFT JOIN
+                    "Companies" "C" ON "O"."companyId" = "C"."id"
+                WHERE
+                    "P"."bankAccount" = $1 OR "C"."bankAccount" = $1;`, [bankAccount])) ?? [];
+                if (!business || !owner) break; // free money woo-hoo
                 await new SQSClient({
                     region: process.env.REGION,
-                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount, userId: user.id})}))
+                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount, ownerId: owner.id})}))
             }
             break;
         case 'outgoing_payment':
