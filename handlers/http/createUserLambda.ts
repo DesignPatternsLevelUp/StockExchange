@@ -1,6 +1,7 @@
 import {APIGatewayProxyHandler} from 'aws-lambda'
 import {SendMessageCommand, SQSClient} from "@aws-sdk/client-sqs";
 import {parseInput} from "../../helpers/APIGatewayInputParser";
+import {stockExchangeBankAccount} from "../../helpers/Bank";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
@@ -12,7 +13,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         body: JSON.stringify({message: 'Badly formatted request'})
     }
     try {
-        const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${user.bankAccount}`, { method: 'GET', headers: { 'X-Origin': 'stock_exchange'} });
+        const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${user.bankAccount}`, { method: 'GET', headers: { 'X-Origin': stockExchangeBankAccount} });
         if (verified.status === 404) {
             return {
                 statusCode: 400,

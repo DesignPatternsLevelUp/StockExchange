@@ -12,7 +12,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks,createUser,transferStocks,postDividendRequest,transactionsCallback,sellStocks,getAllUsers]
+        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks,createUser,transferStocks,postDividendRequest,transactionsCallback,sellStocks,getAllUsers,buyStocks]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -54,7 +54,7 @@ jobs:
   deploySQS:
     strategy:
       matrix:
-        sqsLambdafiles: [createBusiness,createUser,postDividendRequest,transferStocks,sellStocks]
+        sqsLambdafiles: [createBusiness,createUser,postDividendRequest,transferStocks,sellStocks,buyStocks]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

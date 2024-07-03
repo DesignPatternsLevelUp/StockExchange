@@ -1,5 +1,6 @@
 import {SQSHandler} from "aws-lambda";
 import {query, withClient} from "../../helpers/DBquery";
+import {stockExchangeBankAccount} from "../../helpers/Bank";
 
 export const handler: SQSHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
@@ -36,7 +37,7 @@ export const handler: SQSHandler = async (event, context) => {
         const response = await fetch(`${process.env.BANK_URL}/transactions/create`, {
             method: 'POST',
             body: JSON.stringify({transactions}),
-            headers: { 'X-Origin': 'stock_exchange'}
+            headers: { 'X-Origin': stockExchangeBankAccount}
         });
         if (!response.ok) throw new Error('Paying dividends failed');
     })
