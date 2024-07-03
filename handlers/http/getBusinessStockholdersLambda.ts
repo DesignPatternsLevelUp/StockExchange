@@ -5,25 +5,25 @@ import {query, withClient} from "../../helpers/DBquery";
 const getStockHoldersFromDb = async (businessId: string): Promise<Array<StockHolder> | null> => {
     return withClient(client => query<Stock & StockHolder>(client,`
             SELECT
-                COALESCE(C.bankAccount, P.bankAccount) AS bankAccount,
-                SUM(S.numShares) AS quantity,
+                COALESCE("C"."bankAccount", "P"."bankAccount") AS "bankAccount",
+                SUM("S"."numShares") AS "quantity",
                 CASE
-                    WHEN O.isCompany = 1 THEN 'COMPANY'
+                    WHEN "O"."isCompany" = 1 THEN 'COMPANY'
                     ELSE 'PERSONA'
-                END AS holderType
+                END AS "holderType"
             FROM 
-                Shares S
+                "Shares" "S"
             JOIN 
-                Owners O ON S.ownerId = O.id
+                "Owners" "O" ON "S"."ownerId" = "O"."id"
             LEFT JOIN 
-                Companies C ON O.isCompany = 1 AND O.companyId = C.id
+                "Companies" "C" ON "O"."isCompany" = 1 AND "O"."companyId" = "C"."id"
             LEFT JOIN 
-                Persons P ON O.isCompany = 0 AND O.personId = P.id
+                "Persons" "P" ON "O"."isCompany" = 0 AND "O"."personId" = "P"."id"
             WHERE 
-                S.companyId = $1
+                "S"."companyId" = $1
             GROUP BY 
-                COALESCE(C.bankAccount, P.bankAccount),
-                O.isCompany;`,
+                COALESCE("C"."bankAccount", "P"."bankAccount"),
+                "O"."isCompany";`,
         [businessId]));
 }
 

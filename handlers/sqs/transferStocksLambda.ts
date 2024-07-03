@@ -5,36 +5,36 @@ import {Client} from "pg";
 
 const transferStock = async (client: Client, body: StockTransfer) => {
     const [shares] = await query<{ availableShares: number}>(client, `
-    SELECT SUM(numShares) AS availableShares
-        FROM Shares
-        WHERE ownerId = $1 AND companyId = $2 AND forSale = 0
-        GROUP BY companyId`,
+    SELECT SUM("numShares") AS "availableShares"
+        FROM "Shares"
+        WHERE "ownerId" = $1 AND "companyId" = $2 AND "forSale" = 0
+        GROUP BY "companyId"`,
         [body.fromUserId, body.businessId]) ?? [];
     if (!shares || shares.availableShares < body.quantity) throw new Error('Not enough shares');
 
     await query(client, `
-    UPDATE Shares
-        SET numShares = numShares - $1
-        WHERE ownerId = $2 AND companyId = $3 AND forSale = 0`,
+    UPDATE "Shares"
+        SET "numShares" = "numShares" - $1
+        WHERE "ownerId" = $2 AND "companyId" = $3 AND "forSale" = 0`,
         [body.quantity, body.fromUserId, body.businessId]);
 
     const update = await query(client, `
-    UPDATE Shares
-        SET numShares = numShares + $1
-        WHERE ownerId = $2 AND companyId = $3 AND forSale = false
-        RETURNING id`);
+    UPDATE "Shares"
+        SET "numShares" = "numShares" + $1
+        WHERE "ownerId" = $2 AND "companyId" = $3 AND "forSale" = false
+        RETURNING "id"`);
     if (!update) throw new Error('Update failed');
     if (update.length === 0) {
         await query(client, `
-        INSERT INTO Shares (companyId, numShares, ownerId, forSale)
+        INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
                  VALUES ($1, $2, $3, 0)`,
             [body.businessId, body.quantity, body.toUserId])
     }
     const [transaction] = await query<{ id: string }>(client, `
-    INSERT INTO Transactions (sellerId, buyerId, quantity, pricePerShare, companyId)
+    INSERT INTO "Transactions" ("sellerId", "buyerId", "quantity", "pricePerShare", "companyId")
              VALUES ($1, $2, $3, 
-             (SELECT pricePerShare FROM Companies WHERE id = $4), $4)
-             RETURNING id`,
+             (SELECT "pricePerShare" FROM "Companies" WHERE "id" = $4), $4)
+             RETURNING "id"`,
         [body.fromUserId, body.toUserId, body.quantity, body.businessId]) ?? [];
     if (!transaction) throw new Error('Transaction failed');
     return {

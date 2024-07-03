@@ -21,21 +21,21 @@ export const handler: SQSHandler = async (event, context) => {
     await withClient(async client => {
         const holders = await query<{bankAccount: string, numberOfShares: number}>(client, `
         SELECT
-            COALESCE(P.bankAccount, C.bankAccount) AS bankAccount,
-            SUM(S.numShares) AS numberOfShares
+            COALESCE("P"."bankAccount", "C"."bankAccount") AS "bankAccount",
+            SUM("S"."numShares") AS "numberOfShares"
         FROM
-            Shares S
+            "Shares" "S"
         JOIN
-            Owners O ON S.ownerId = O.id
+            "Owners" "O" ON "S"."ownerId" = "O"."id"
         LEFT JOIN
-            Persons P ON O.personId = P.id
+            "Persons" "P" ON "O"."personId" = "P"."id"
         LEFT JOIN
-            Companies C ON O.companyId = C.id
+            "Companies" "C" ON "O"."companyId" = "C"."id"
         WHERE
-            S.companyId = $1
+            "S"."companyId" = $1
         GROUP BY
-            COALESCE(P.bankAccount, C.bankAccount),
-            O.id`, [body.businessId]);
+            COALESCE("P"."bankAccount", "C"."bankAccount"),
+            "O"."id"`, [body.businessId]);
         if (!holders) throw new Error('Unable to get stock holders');
         const totalShares = holders.reduce((previousValue, currentValue) => previousValue + currentValue.numberOfShares, 0);
         const transactions = holders.map(holder => ({

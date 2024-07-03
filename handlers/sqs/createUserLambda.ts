@@ -4,15 +4,15 @@ import {Client} from "pg";
 
 const createUser = async (client: Client, user: { bankAccount: string}) => {
     const [userDetails] = await query<{id: string}>(client, `
-    INSERT INTO Users (bankAccount)
+    INSERT INTO "Users" ("bankAccount")
         VALUES ($1)
-    RETURNING id`,
+    RETURNING "id"`,
         [user.bankAccount]) ?? [];
     if (!userDetails) throw new Error ('Insert user failed');
     const [ownerResult] = await query<{id: string}>(client, `
-    INSERT INTO Owners (isCompany, personId)
+    INSERT INTO "Owners" ("isCompany", "personId")
          VALUES (0, $1)
-    RETURNING id`, [userDetails.id]) ?? [];
+    RETURNING "id"`, [userDetails.id]) ?? [];
     if (!ownerResult) throw new Error('Insert Owner failed');
     return {
         ...user,

@@ -5,17 +5,17 @@ import {query, withClient} from "../../helpers/DBquery";
 const getStocksFromDb = async (ownerId: string): Promise<Array<Stock> | null> => {
     return withClient(client => query<Stock>(client, `
     SELECT
-        S.companyId AS businessId,
-        SUM(S.numShares) AS quantity,
-        C.pricePerShare AS currentMarketValue
+        "S"."companyId" AS "businessId",
+        SUM("S"."numShares") AS "quantity",
+        "C"."pricePerShare" AS "currentMarketValue"
     FROM
-        Shares S
+        "Shares" "S"
     JOIN
-        Companies C ON S.companyId = C.id
+        "Companies" "C" ON "S"."companyId" = "C"."id"
     WHERE
-        S.ownerId = $1 AND S.forSale = false
+        "S"."ownerId" = $1 AND "S"."forSale" = 0
     GROUP BY
-        S.companyId;`, [ownerId]));
+        "S"."companyId";`, [ownerId]));
 }
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
