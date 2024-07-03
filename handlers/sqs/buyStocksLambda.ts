@@ -22,7 +22,7 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
                     "id",
                     "ownerId" AS "sellerId",
                     "companyId",
-                    LEAST("numShares", "numShares" + ($2 - SUM("numShares")) OVER (ORDER BY "id")) AS "sharesToBuy"
+                    LEAST("numShares", "numShares" + ($2 - SUM("numShares") OVER (ORDER BY "id"))) AS "sharesToBuy"
                 FROM
                     "SelectedShares"
                 WHERE
