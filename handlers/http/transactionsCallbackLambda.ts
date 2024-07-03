@@ -42,7 +42,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 if (!business || !owner) break; // free money woo-hoo
                 await new SQSClient({
                     region: process.env.REGION,
-                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount, ownerId: owner.id}), MessageGroupId: 'buyStock', MessageDeduplicationId: transaction.id}))
+                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({companyId: businessId, amount, ownerId: owner.id}), MessageGroupId: 'buyStock', MessageDeduplicationId: transaction.id}))
             }
             break;
         case 'outgoing_payment':
