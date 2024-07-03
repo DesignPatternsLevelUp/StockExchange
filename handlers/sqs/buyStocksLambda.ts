@@ -115,7 +115,7 @@ const insertIntoDb = async (data: { ownerId: string, companyId: string, amount: 
                     "AvailableShares";
             `, [data.companyId, data.amount]) ?? [];
             if (!availableShares) throw new Error('Unable to find stocks');
-            const {quantity, companyId, ownerId} = {...data, quantity: availableShares.quantity};
+            const {quantity, companyId, ownerId} = {...data, quantity: availableShares.maxPurchasableShares};
             const response = await buyStock(client, {quantity, companyId, ownerId});
             await query(client, 'COMMIT');
             return response;
