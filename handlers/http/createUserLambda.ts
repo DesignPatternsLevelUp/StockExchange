@@ -1,23 +1,22 @@
 import {APIGatewayProxyHandler} from 'aws-lambda'
 import {SendMessageCommand, SQSClient} from "@aws-sdk/client-sqs";
 import {parseInput} from "../../helpers/APIGatewayInputParser";
-import {Business} from "../../definitions/Business";
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-    const business = parseInput<Business>(event);
+    const user = parseInput<{  bankAccount: string }>(event);
     const callBackUrl = event.queryStringParameters?.['callBackUrl'];
-    if (!business || !callBackUrl) return {
+    if (!user || !callBackUrl) return {
         statusCode: 400,
         body: JSON.stringify({message: 'Badly formatted request'})
     }
     try {
-        const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${business.bankAccount}`, { method: 'GET', });
+        const verified = await fetch(`${process.env.BANK_URL}/account/balance?accountName=${user.bankAccount}`, { method: 'GET', });
         if (verified.status === 404) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({message: `Invalid bank Account: ${business.bankAccount}`})
+                body: JSON.stringify({message: `Invalid bank Account: ${user.bankAccount}`})
             };
         }
     } catch (error) {
@@ -29,13 +28,13 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         await new SQSClient({
             region: process.env.REGION,
-        }).send(new SendMessageCommand({QueueUrl: process.env.createBusinessQueueUrl, MessageBody: JSON.stringify({...business, callBackUrl})}))
+        }).send(new SendMessageCommand({QueueUrl: process.env.createUserQueueUrl, MessageBody: JSON.stringify({...user, callBackUrl})}))
         return {
             statusCode: 202,
             body: JSON.stringify({message: 'Request Accepted'}),
         }
     } catch (error) {
-        console.error('Error sending message to create business queue:', error);
+        console.error('Error sending message to create user queue:', error);
         return {
             statusCode: 500,
             body: JSON.stringify({message: 'Internal Server Error'})
