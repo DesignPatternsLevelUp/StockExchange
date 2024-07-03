@@ -80,12 +80,6 @@ jobs:
       - name: Zip
         run: (cd dist/sqs && zip -r ../../${{ matrix.sqsLambdafiles }}Lambda.zip index.js)
 
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.sqsLambdafiles }}Lambda.zip
-          path: ${{ matrix.sqsLambdafiles }}Lambda.zip
-
       - name: Deploy to AWS
         uses: appleboy/lambda-action@master
         with:
