@@ -3,6 +3,7 @@ import {query, withClient} from "../../helpers/DBquery";
 import {Client} from "pg";
 
 const buyStock = async (client: Client, body: { ownerId: string, companyId: string, quantity: number}) => {
+    console.log('Buy Stock Input:', body);
     const sharesToBuy = await query<{id: string, sellerId: string, companyId: string, sharesToBuy: number}>(client, `
             WITH "SelectedShares" AS (
                 SELECT
