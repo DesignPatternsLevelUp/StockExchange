@@ -10,7 +10,7 @@ export const handler: SQSHandler = async (event, context) => {
     let page = 1;
     let pageSize = 25;
     while (!linkedTransaction) {
-        const response = await fetch(`${process.env.BANK_URL}/transactions?page=${page}&pageSize=${pageSize}`);
+        const response = await fetch(`${process.env.BANK_URL}/transactions?page=${page}&pageSize=${pageSize}`, { headers: { 'X-Origin': 'stock_exchange'} });
         if (!response.ok) throw new Error('Bank down');
         const body = await response.json();
         const transactions: Array<{creditRef: string, debitAccountName: string, amount: number}> = body.data.items;
@@ -46,7 +46,8 @@ export const handler: SQSHandler = async (event, context) => {
         }));
         const response = await fetch(`${process.env.BANK_URL}/transactions/create`, {
             method: 'POST',
-            body: JSON.stringify({transactions})
+            body: JSON.stringify({transactions}),
+            headers: { 'X-Origin': 'stock_exchange'}
         });
         if (!response.ok) throw new Error('Paying dividends failed');
     })
