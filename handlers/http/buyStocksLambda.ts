@@ -26,7 +26,7 @@ const getStock = async (data: {buyerId: string, businessId: string} & ({ quantit
                         "companyId" = $1 AND "forSale" = B'1'
                 )
                 SELECT
-                    LEAST("AvailableShares"."totalSharesForSale", $2)) AS "maxPurchasableShares",
+                    LEAST("AvailableShares"."totalSharesForSale", $2) AS "maxPurchasableShares",
                     "CompanyPrice"."pricePerShare" AS "pricePerShare"
                 FROM
                     "CompanyPrice",
