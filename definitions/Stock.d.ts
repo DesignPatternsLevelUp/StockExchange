@@ -10,3 +10,10 @@ export type StockHolder = {
     holderType: string;
     bankAccount: string;
 }
+
+export type StockTransfer = {
+    fromUserId: string;
+    toUserId: string;
+    businessId: string;
+    quantity: number
+}
