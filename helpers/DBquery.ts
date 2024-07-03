@@ -1,7 +1,10 @@
-import {Client, QueryResultRow} from "pg";
+import {Client, ClientConfig, QueryResultRow} from "pg";
 
 export async function withClient<T>(handler: (client: Client) => T) {
-    const config = {
+    const config: ClientConfig = {
+        ssl: {
+            rejectUnauthorized: false,
+        },
         user: process.env.DB_USER,
         host: process.env.DB_HOST,
         database: process.env.DB_NAME,
