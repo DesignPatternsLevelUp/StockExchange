@@ -5,18 +5,18 @@ import {Client} from "pg";
 
 const createCompany = async (client: Client, data: Business) => {
     const companyResult = await query<{id: string}>(client, `
-        INSERT INTO Companies (name, bankAccount, pricePerShare)
+        INSERT INTO "Companies" ("name", "bankAccount", "pricePerShare")
             VALUES ($1, $2, $3)
-        RETURNING id`, [data.name, data.bankAccount, 1024 /* TODO */]);
+        RETURNING "id"`, [data.name, data.bankAccount, 1024 /* TODO */]);
     if (!companyResult) throw new Error ('Create Company failed');
     const ownerResult = await query<{id: string}>(client, `
-        INSERT INTO Owners (isCompany, companyId)
-             VALUES (1, $1)
-        RETURNING id`, [companyResult[0].id]);
+        INSERT INTO "Owners" ("isCompany", "companyId")
+             VALUES (B'1', $1)
+        RETURNING "id"`, [companyResult[0].id]);
     if (!ownerResult) throw new Error('Create Owner failed');
     const shareResult = await query(client, `
-        INSERT INTO Shares (companyId, numShares, ownerId, forSale)
-            VALUES ($1, 100000, $2, 0)`, [companyResult[0].id, ownerResult[0].id]);
+        INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
+            VALUES ($1, 100000, $2, B'0')`, [companyResult[0].id, ownerResult[0].id]);
     if (!shareResult) throw new Error('Create Shares failed');
     return {
         ...data,
@@ -44,7 +44,7 @@ export const handler: SQSHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     const [record] = event.Records;
-    const business: Business & { callBackUrl: string } = JSON.parse(record.body);
+    const business: Business & { callbackUrl: string } = JSON.parse(record.body);
     const representation = await insertIntoDb(business);
-    await fetch(business.callBackUrl, {body: JSON.stringify(representation), method: 'POST'});
+    await fetch(business.callbackUrl, {body: JSON.stringify(representation), method: 'POST'});
 };

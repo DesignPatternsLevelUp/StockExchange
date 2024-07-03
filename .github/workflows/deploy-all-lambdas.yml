@@ -12,7 +12,7 @@ jobs:
   deploy:
     strategy:
       matrix:
-        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks]
+        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks,createUser,transferStocks,postDividendRequest,transactionsCallback,sellStock]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -28,13 +28,12 @@ jobs:
 
       - name: Install Dependencies
         run: npm i
-        
+
       - name: Build
         run: npm run build
 
       - name: Rename build file
         run: mv dist/http/${{ matrix.lambdafiles }}Lambda.js dist/http/index.js
-
 
       - name: Zip
         run: (cd dist/http && zip -r ../../${{ matrix.lambdafiles }}Lambda.zip index.js)
@@ -51,3 +50,39 @@ jobs:
           aws_region: ${{ secrets.AWS_REGION }}
           function_name: ${{ matrix.lambdafiles }}
           zip_file: ${{ matrix.lambdafiles }}Lambda.zip
+
+  deploySQS:
+    strategy:
+      matrix:
+        sqsLambdafiles: [createBusiness,createUser,postDividendRequest,transferStocks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: github_lambda_deploy_${{ matrix.sqsLambdafiles }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install Dependencies
+        run: npm i
+
+      - name: Build
+        run: npm run build
+
+      - name: Rename build file
+        run: mv dist/sqs/${{ matrix.sqsLambdafiles }}Lambda.js dist/sqs/index.js
+
+      - name: Zip
+        run: (cd dist/sqs && zip -r ../../${{ matrix.sqsLambdafiles }}Lambda.zip index.js)
+
+      - name: Deploy to AWS
+        uses: appleboy/lambda-action@master
+        with:
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: ${{ matrix.sqsLambdafiles }}SQS
+          zip_file: ${{ matrix.sqsLambdafiles }}Lambda.zip
