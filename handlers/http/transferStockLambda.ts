@@ -7,6 +7,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     console.log(`Event: ${JSON.stringify(event, null, 2)}`);
     console.log(`Context: ${JSON.stringify(context, null, 2)}`);
     const body = parseInput<StockTransfer>(event);
+    const callBackUrl = event.queryStringParameters?.['callBackUrl'];
     if (!body) return {
         statusCode: 400,
         body: JSON.stringify({message: 'Badly formatted request'})
@@ -14,7 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     try {
         await new SQSClient({
             region: process.env.REGION,
-        }).send(new SendMessageCommand({QueueUrl: process.env.transferStockQueueUrl, MessageBody: JSON.stringify(body)}))
+        }).send(new SendMessageCommand({QueueUrl: process.env.transferStockQueueUrl, MessageBody: JSON.stringify({...body, callBackUrl})}))
         return {
             statusCode: 202,
             body: JSON.stringify({message: 'Request Accepted'}),
