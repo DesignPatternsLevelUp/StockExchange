@@ -8,11 +8,6 @@
   "main": "index.js",
   "scripts": {
     "build": "npm install && esbuild handlers/**/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist",
-    "build-models": "esbuild database/models/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist/database/models",
-    "build-data-source": "esbuild database/*.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outdir=dist/database/",
-    "generate-typeorm-migrations": "npx typeorm migration:generate dist/database/migrations/migration -d dist/database/data-source.js -o",
-    "run-typeorm-migrations": "npx typeorm migration:run -d dist/database/data-source.js",
-    "typeorm-migrations": "npm run build-models && npm run build-data-source && npm run generate-typeorm-migrations && npm run run-typeorm-migrations",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -24,9 +19,7 @@
     "@types/aws-sdk": "^2.7.0",
     "aws-sdk": "^2.1649.0",
     "dotenv": "^16.4.5",
-    "pg": "^8.12.0",
-    "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.20"
+    "pg": "^8.12.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.140",
