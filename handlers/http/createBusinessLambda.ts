@@ -38,7 +38,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
         console.error('Error sending message to create business queue:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({message: 'Internal Server Error'})
+            body: JSON.stringify({message: 'Internal Server Error', error: JSON.stringify(error)})
         }
     }
 }
