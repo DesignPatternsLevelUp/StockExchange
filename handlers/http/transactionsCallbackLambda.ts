@@ -14,14 +14,13 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
     }
     switch (transaction.type) {
         case 'incoming_payment':
-            transaction.creditAccountName = 'us';
             const isDividend = transaction.reference === 'dividends';
             const bankAccount = transaction.debitAccountName;
             const amount = transaction.amount;
             if (isDividend) {
                 const [business] = await withClient(client => query<{id: string}>(client, `
                 SELECT "id" FROM "Companies" WHERE "bankAccount" = $1`, [bankAccount])) ?? [];
-                if (!business) break;
+                if (!business) break; // free money woo-hoo
                 await new SQSClient({
                     region: process.env.REGION,
                 }).send(new SendMessageCommand({QueueUrl: process.env.payDividendsQueueUrl, MessageBody: JSON.stringify({businessId: business.id, amount})}))
@@ -29,10 +28,12 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 const businessId = transaction.reference;
                 const [business] = await withClient(client => query<{id: string}>(client, `
                 SELECT "id" FROM "Companies" WHERE "id" = $1`, [businessId])) ?? [];
-                if (!business) break;
+                const [user] = await withClient(client => query<{id: string}>(client, `
+                SELECT "id" FROM "Persons" WHERE "bankAccount" = $1`, [bankAccount])) ?? [];
+                if (!business || !user) break; // free money woo-hoo
                 await new SQSClient({
                     region: process.env.REGION,
-                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount})}))
+                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount, userId: user.id})}))
             }
             break;
         case 'outgoing_payment':
