@@ -15,7 +15,7 @@ const transferStock = async (client: Client, body: StockTransfer) => {
     await query(client, `
     UPDATE "Shares"
         SET "numShares" = "numShares" - $1
-        WHERE "ownerId" = $2 AND "companyId" = $3 AND "forSale" = "0"`,
+        WHERE "ownerId" = $2 AND "companyId" = $3 AND "forSale" = B'0'`,
         [body.quantity, body.fromUserId, body.businessId]);
 
     const update = await query(client, `
@@ -27,7 +27,7 @@ const transferStock = async (client: Client, body: StockTransfer) => {
     if (update.length === 0) {
         await query(client, `
         INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
-                 VALUES ($1, $2, $3, "0")`,
+                 VALUES ($1, $2, $3, B'0')`,
             [body.businessId, body.quantity, body.toUserId])
     }
     const [transaction] = await query<{ id: string }>(client, `

@@ -8,7 +8,7 @@ const getStockHoldersFromDb = async (businessId: string): Promise<Array<StockHol
                 COALESCE("C"."bankAccount", "P"."bankAccount") AS "bankAccount",
                 SUM("S"."numShares") AS "quantity",
                 CASE
-                    WHEN "O"."isCompany" = "1" THEN 'COMPANY'
+                    WHEN "O"."isCompany" = B'1' THEN 'COMPANY'
                     ELSE 'PERSONA'
                 END AS "holderType"
             FROM 
@@ -16,9 +16,9 @@ const getStockHoldersFromDb = async (businessId: string): Promise<Array<StockHol
             JOIN 
                 "Owners" "O" ON "S"."ownerId" = "O"."id"
             LEFT JOIN 
-                "Companies" "C" ON "O"."isCompany" = "1" AND "O"."companyId" = "C"."id"
+                "Companies" "C" ON "O"."isCompany" = B'1' AND "O"."companyId" = "C"."id"
             LEFT JOIN 
-                "Persons" "P" ON "O"."isCompany" = "0" AND "O"."personId" = "P"."id"
+                "Persons" "P" ON "O"."isCompany" = B'0' AND "O"."personId" = "P"."id"
             WHERE 
                 "S"."companyId" = $1
             GROUP BY 

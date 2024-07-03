@@ -11,12 +11,12 @@ const createCompany = async (client: Client, data: Business) => {
     if (!companyResult) throw new Error ('Create Company failed');
     const ownerResult = await query<{id: string}>(client, `
         INSERT INTO "Owners" ("isCompany", "companyId")
-             VALUES ("1", $1)
+             VALUES (B'1', $1)
         RETURNING "id"`, [companyResult[0].id]);
     if (!ownerResult) throw new Error('Create Owner failed');
     const shareResult = await query(client, `
         INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
-            VALUES ($1, 100000, $2, "0")`, [companyResult[0].id, ownerResult[0].id]);
+            VALUES ($1, 100000, $2, B'0')`, [companyResult[0].id, ownerResult[0].id]);
     if (!shareResult) throw new Error('Create Shares failed');
     return {
         ...data,
