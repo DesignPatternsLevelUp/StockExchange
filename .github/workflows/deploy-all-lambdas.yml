@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   id-token: write
@@ -12,7 +12,23 @@ jobs:
   deploy:
     strategy:
       matrix:
-        lambdafiles: [createBusiness,getBusinessStockholders,getBusinesses,getMarketStocks,getUserStocks,createUser,transferStocks,postDividendRequest,transactionsCallback,sellStocks,getAllUsers,retrieveAuthToken,buyStocks]
+        lambdafiles:
+          [
+            createBusiness,
+            getBusinessStockholders,
+            getBusinesses,
+            getMarketStocks,
+            getUserStocks,
+            createUser,
+            transferStocks,
+            postDividendRequest,
+            transactionsCallback,
+            sellStocks,
+            getAllUsers,
+            retrieveAuthToken,
+            buyStocks,
+            reset,
+          ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -54,7 +70,15 @@ jobs:
   deploySQS:
     strategy:
       matrix:
-        sqsLambdafiles: [createBusiness,createUser,postDividendRequest,transferStocks,sellStocks,buyStocks]
+        sqsLambdafiles:
+          [
+            createBusiness,
+            createUser,
+            postDividendRequest,
+            transferStocks,
+            sellStocks,
+            buyStocks,
+          ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
