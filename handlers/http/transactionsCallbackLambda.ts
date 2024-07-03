@@ -23,7 +23,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 if (!business) break; // free money woo-hoo
                 await new SQSClient({
                     region: process.env.REGION,
-                }).send(new SendMessageCommand({QueueUrl: process.env.payDividendsQueueUrl, MessageBody: JSON.stringify({businessId: business.id, amount})}))
+                }).send(new SendMessageCommand({QueueUrl: process.env.payDividendsQueueUrl, MessageBody: JSON.stringify({businessId: business.id, amount}), MessageGroupId: 'payDividends', MessageDeduplicationId: transaction.id}))
             } else { // Buy stock
                 const businessId = transaction.reference;
                 const [business] = await withClient(client => query<{id: string}>(client, `
@@ -42,7 +42,7 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
                 if (!business || !owner) break; // free money woo-hoo
                 await new SQSClient({
                     region: process.env.REGION,
-                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount, ownerId: owner.id})}))
+                }).send(new SendMessageCommand({QueueUrl: process.env.buyStockQueueUrl, MessageBody: JSON.stringify({businessId, amount, ownerId: owner.id}), MessageGroupId: 'buyStock', MessageDeduplicationId: transaction.id}))
             }
             break;
         case 'outgoing_payment':
