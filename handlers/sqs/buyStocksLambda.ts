@@ -54,7 +54,7 @@ const buyStock = async (client: Client, body: { ownerId: string, companyId: stri
     const insertOrUpdateSharesQuery = `
             INSERT INTO "Shares" ("companyId", "numShares", "ownerId", "forSale")
             VALUES ($1, $2, $3, B'0')
-            ON CONFLICT ("companyId", "ownerId")
+            ON CONFLICT ("companyId", "ownerId", "forSale")
             DO UPDATE SET
                 "numShares" = "Shares"."numShares" + EXCLUDED."numShares";
         `;
